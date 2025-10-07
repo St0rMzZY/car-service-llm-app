@@ -6,8 +6,6 @@ import 'package:http/http.dart' as http;
 import '../services/api_service.dart';
 import '../models/chat_message.dart';
 
-/// Conversation model used by UI. Includes optional s3 metadata so ChatScreen
-/// can open the associated PDF easily.
 class ChatConversation {
   final String id;
   final String title;
@@ -48,7 +46,6 @@ class ChatHistoryProvider with ChangeNotifier {
       UnmodifiableListView(_conversations);
   bool get isLoading => _isLoading;
 
-  /// Fetch conversation history for a user from backend /get-chat-history/{user_email}
   Future<void> fetchHistory(String userEmail) async {
     _isLoading = true;
     notifyListeners();
@@ -123,7 +120,6 @@ class ChatHistoryProvider with ChangeNotifier {
     }
   }
 
-  /// Create a chat row on server referencing a PDF. Returns ChatConversation if created.
   Future<ChatConversation?> createChatWithPdf({
     required String title,
     required String pdfId,

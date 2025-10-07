@@ -78,8 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
         result['name'] ?? (localPath != null ? p.basename(localPath) : null);
     if (localPath == null || fileName == null) return;
 
-    // Let ChatScreen handle upload & chat creation
-    // change to push so user can go back to Home
+
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (_) => ChatScreen(
@@ -205,7 +204,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         title: Text(pdf.name, overflow: TextOverflow.ellipsis),
                         onTap: () {
-                          // Open ChatScreen for an existing server-side document (don't re-upload)
                           Navigator.of(context)
                               .push(
                                 MaterialPageRoute(
@@ -218,7 +216,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                 ),
                               )
                               .then((_) {
-                                // refresh lists after returning
                                 const userEmail = "test@example.com";
                                 Provider.of<ChatHistoryProvider>(
                                   context,
@@ -233,7 +230,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         trailing: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            // view button (unchanged)
                             IconButton(
                               icon: const Icon(
                                 Icons.visibility_outlined,

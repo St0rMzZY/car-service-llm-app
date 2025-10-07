@@ -11,11 +11,9 @@ class ChatMessage {
     this.title,
   });
 
-  // Factory constructor to create a ChatMessage from a JSON map
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       content: json['content'] ?? '',
-      // Convert the string from JSON back to an enum
       type: MessageType.values.firstWhere(
         (e) => e.toString() == json['type'],
         orElse: () => MessageType.reply,
@@ -24,11 +22,9 @@ class ChatMessage {
     );
   }
 
-  // Method to convert a ChatMessage object to a JSON map
   Map<String, dynamic> toJson() {
     return {
       'content': content,
-      // Convert the enum to a string for JSON serialization
       'type': type.toString(),
       'title': title,
     };

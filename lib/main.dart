@@ -28,7 +28,6 @@ Future<void> main() async {
     Logger.root.severe('Error initializing cameras: ${e.code}\n${e.description}');
   }
 
-  // Wrap the app with MultiProvider
   runApp(
     MultiProvider(
       providers: [

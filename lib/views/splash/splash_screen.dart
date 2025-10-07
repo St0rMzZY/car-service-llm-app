@@ -23,10 +23,6 @@ class SplashScreenState extends State<SplashScreen> {
     Timer(const Duration(seconds: 2), () {
       if (!mounted) return;
 
-      // --- BYPASSING LOGIN ---
-      // For now, we will always go directly to the HomeScreen.
-      // We will add the login logic back in at the end.
-      // -----------------------
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(

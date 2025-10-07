@@ -2,7 +2,6 @@ import 'package:amplify_flutter/amplify_flutter.dart';
 import 'package:flutter/foundation.dart';
 
 class S3Service {
-  /// Uploads a file to S3 and returns its public URL.
   static Future<String?> uploadFile(String filePath, String fileName) async {
     try {
       final awsFile = AWSFile.fromPath(filePath);
@@ -13,7 +12,6 @@ class S3Service {
         path: path,
       ).result;
 
-      // --- CORRECTED: Use StoragePath.fromString for the getUrl call ---
       final getUrlResult = await Amplify.Storage.getUrl(
         path: StoragePath.fromString(result.uploadedItem.path),
       ).result;

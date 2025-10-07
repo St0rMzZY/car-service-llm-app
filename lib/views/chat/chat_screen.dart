@@ -114,7 +114,6 @@ class _ChatScreenState extends State<ChatScreen> {
     );
   }
 
-  /// Try to resolve a presigned URL for the uploaded PDF using listFiles.
   Future<void> _ensurePdfHasPresignedUrl(PdfFile uploadedPdf) async {
     if ((uploadedPdf.s3Url?.isNotEmpty ?? false)) return;
     try {
@@ -138,7 +137,7 @@ class _ChatScreenState extends State<ChatScreen> {
         }
       }
     } catch (_) {
-      // ignore resolution errors
+
     }
   }
 
@@ -158,7 +157,7 @@ class _ChatScreenState extends State<ChatScreen> {
     });
 
     const userEmail = "test@example.com";
-    // capture providers before async work
+
     final pdfProvider = Provider.of<PdfProvider>(context, listen: false);
     final chatHistoryProvider = Provider.of<ChatHistoryProvider>(
       context,
@@ -192,16 +191,16 @@ class _ChatScreenState extends State<ChatScreen> {
         }
         setState(() => _activePdf = uploadedPdf);
 
-        // add to provider and try to resolve presigned url for immediate viewing
+
         pdfProvider.addPdf(uploadedPdf);
         try {
           await pdfProvider.fetchRecentPdfs(userEmail);
         } catch (_) {}
 
-        // attempt to resolve presigned url immediately if backend returned none
+
         await _ensurePdfHasPresignedUrl(uploadedPdf);
 
-        // If server returned conversation/messages, show them
+
         final convFromProcess =
             (res['conversation_id'] ?? res['conversationId'])?.toString();
         if (convFromProcess != null && convFromProcess.isNotEmpty) {
@@ -230,7 +229,6 @@ class _ChatScreenState extends State<ChatScreen> {
           return;
         }
 
-        // Otherwise attempt to create a chat record on server using s3_key (preferred) or s3_url
         try {
           final created = await chatHistoryProvider.createChatWithPdf(
             title: uploadedPdf.name,
@@ -263,7 +261,6 @@ class _ChatScreenState extends State<ChatScreen> {
             );
           }
 
-          // after createChatWithPdf, attempt presigned resolution one more time
           if (!mounted) return;
           await _ensurePdfHasPresignedUrl(_activePdf ?? uploadedPdf);
         } catch (e) {
@@ -335,12 +332,12 @@ class _ChatScreenState extends State<ChatScreen> {
           await pdfProvider.fetchRecentPdfs(userEmail);
         } catch (_) {}
 
-        // resolve presigned url so user can open immediately
+
         await _ensurePdfHasPresignedUrl(uploadedPdf);
 
         if (_conversationId != null) {
           try {
-            // Prefer calling backend create-chat with s3_key first
+
             await ApiService.createChat({
               'title': _activePdf?.name ?? 'Attach PDF',
               'pdf_id': uploadedPdf.id,
@@ -350,7 +347,6 @@ class _ChatScreenState extends State<ChatScreen> {
               'conversation_id': _conversationId,
             });
           } catch (_) {
-            // ignore attach failure; user still has file locally
           }
         }
       } else {
@@ -420,7 +416,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  /// Helper: poll file-status endpoint for file readiness
+
   Future<bool> _waitForFileReady({
     String? fileId,
     int maxAttempts = 20,
@@ -437,7 +433,7 @@ class _ChatScreenState extends State<ChatScreen> {
         if (status == 'completed') return true;
         if (status == 'failed') return false;
       } catch (_) {
-        // transient error - ignore and retry
+
       }
       await Future.delayed(interval);
     }
@@ -481,7 +477,7 @@ class _ChatScreenState extends State<ChatScreen> {
             llm: llmToSend,
             conversationId: _conversationId,
           );
-          break; // success
+          break; 
         } catch (e) {
           final msg = e.toString().toLowerCase();
           if (msg.contains('425') ||
@@ -496,9 +492,9 @@ class _ChatScreenState extends State<ChatScreen> {
               await Future.delayed(waitBetweenRetries);
               continue;
             }
-            continue; // retry immediately after confirmed ready
+            continue; 
           }
-          // other error -> show as message and stop
+
           if (!mounted) return;
           setState(() {
             _messages.add(
@@ -514,7 +510,7 @@ class _ChatScreenState extends State<ChatScreen> {
       }
 
       if (response != null) {
-        // create local-safe copies of values to avoid analyzer null-index warnings
+
         final convId =
             (response['conversation_id'] ?? response['conversationId'])
                 ?.toString();
@@ -550,7 +546,7 @@ class _ChatScreenState extends State<ChatScreen> {
     }
   }
 
-  // Open remote PDF as chat - resolve s3Key/s3Url via provider/listFiles and create chat
+
   Future<void> _openRemotePdfAsChat(PdfFile file) async {
     setState(() {
       _isLoading = true;
@@ -569,12 +565,12 @@ class _ChatScreenState extends State<ChatScreen> {
     final pdfProvider = Provider.of<PdfProvider>(context, listen: false);
 
     try {
-      // Refresh provider to get s3Url/s3Key if available
+
       try {
         await pdfProvider.fetchRecentPdfs(userEmail);
       } catch (_) {}
 
-      // Try to find a matching provider entry and create a merged PdfFile
+
       final list = pdfProvider.recentPdfs;
       for (final pfile in list) {
         if (pfile.id.isNotEmpty && pfile.id == file.id) {
@@ -607,7 +603,7 @@ class _ChatScreenState extends State<ChatScreen> {
       if (s3Key != null && s3Key.isNotEmpty) {
         await _ensureServerChatForS3(s3Key, fid, file.name);
       } else if (fid != null) {
-        // try to resolve by listing files from API (this will return array thanks to ApiService)
+
         final files = await ApiService.listFiles(userEmail);
         for (final f in files) {
           final map = f as Map<String, dynamic>;
@@ -632,7 +628,7 @@ class _ChatScreenState extends State<ChatScreen> {
           }
         }
       } else {
-        // fallback: if pdf already had a s3Url, attempt to create chat using it
+
         if (file.s3Url != null && file.s3Url!.isNotEmpty) {
           try {
             final resp = await ApiService.createChatFromS3(
@@ -686,7 +682,6 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() => _isLoading = true);
     const userEmail = "test@example.com";
     try {
-      // prefer createChatFromS3 with s3_key
       final resp = await ApiService.createChatFromS3(
         userEmail: userEmail,
         s3Key: s3Key,
@@ -715,7 +710,6 @@ class _ChatScreenState extends State<ChatScreen> {
       throw Exception('Empty response from create-chat-from-s3');
     } catch (e) {
       final err = e.toString().toLowerCase();
-      // If not ready, try to resolve fileId and poll
       if (err.contains('425') ||
           err.contains('processing') ||
           (fileId != null && fileId.isNotEmpty)) {

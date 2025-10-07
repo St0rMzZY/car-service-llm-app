@@ -12,7 +12,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:image/image.dart' as img;
 
-import 'pdf_preview_screen.dart'; // adjust path if needed
+import 'pdf_preview_screen.dart';
 
 Uint8List _processImageIsolate(Map<String, dynamic> args) {
   final Uint8List bytes = args['bytes'] as Uint8List;
@@ -66,14 +66,12 @@ class _CameraScreenState extends State<CameraScreen>
   bool _showFocus = false;
   Offset _focusPoint = Offset.zero;
 
-  // preview key to compute sizes for tap-to-focus
   final GlobalKey _previewKey = GlobalKey();
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    // Go fully immersive
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
     _focusAnimationController = AnimationController(
@@ -109,7 +107,6 @@ class _CameraScreenState extends State<CameraScreen>
         _currentZoom = _currentZoom.clamp(_minZoom, _maxZoom);
         await _controller!.setZoomLevel(_currentZoom);
       } catch (_) {
-        // ignore if not supported
       }
     } catch (e, st) {
       _log.severe('Camera init error: $e\n$st');
@@ -132,7 +129,6 @@ class _CameraScreenState extends State<CameraScreen>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // Restore system UI
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual,
         overlays: SystemUiOverlay.values);
     _focusAnimationController.dispose();
@@ -154,7 +150,7 @@ class _CameraScreenState extends State<CameraScreen>
   Future<void> _takePicture() async {
     if (_isProcessing) return;
 
-    HapticFeedback.lightImpact(); // Haptic feedback for shutter
+    HapticFeedback.lightImpact(); 
     setState(() => _isProcessing = true);
 
     try {
@@ -207,7 +203,6 @@ class _CameraScreenState extends State<CameraScreen>
       if (result != null && result.containsKey('localPath')) {
         Navigator.of(context).pop(result);
       } else {
-        // Re-initialize camera if user discards the preview
         await _initializeCamera();
       }
     } catch (e, st) {
@@ -240,7 +235,6 @@ class _CameraScreenState extends State<CameraScreen>
       await _controller!.setFocusPoint(normalized);
       await _controller!.setFocusMode(FocusMode.auto);
     } catch (e) {
-      // ignore if not supported
     }
 
     setState(() {
@@ -370,7 +364,7 @@ class _CameraScreenState extends State<CameraScreen>
                   ),
                 ),
               ),
-              const SizedBox(width: 48), // To balance the row
+              const SizedBox(width: 48),
             ],
           ),
         ),
@@ -435,16 +429,12 @@ class _CameraScreenState extends State<CameraScreen>
             onTapDown: _onTapToFocus,
             child: LayoutBuilder(
               builder: (context, constraints) {
-                // Get the screen's aspect ratio (width/height)
                 final screenAspectRatio =
                     constraints.maxWidth / constraints.maxHeight;
 
-                // Get the camera's reported aspect ratio (width/height)
                 var previewAspectRatio = _controller!.value.aspectRatio;
 
-                // ** THE FIX IS HERE **
-                // If the screen is in portrait mode and the camera is reporting a
-                // landscape aspect ratio, we invert it to match.
+
                 if (screenAspectRatio < 1 && previewAspectRatio > 1) {
                   previewAspectRatio = 1 / previewAspectRatio;
                 }
@@ -491,7 +481,6 @@ class _CameraScreenState extends State<CameraScreen>
               },
             ),
 
-          // Top and Bottom UI Overlays
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [_buildTopBar(), _buildBottomBar()],

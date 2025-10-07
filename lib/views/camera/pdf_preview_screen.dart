@@ -8,7 +8,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:camera/camera.dart';
-import 'camera_screen.dart'; // local import - ensure path is correct
+import 'camera_screen.dart'; 
 
 class PdfPreviewScreen extends StatefulWidget {
   final List<String> initialImages;
@@ -65,7 +65,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     }
   }
 
-  // Open the in-app CameraScreen to retake the current image
   Future<void> _retakeUsingInAppCamera() async {
     try {
       final cams = await availableCameras();
@@ -88,7 +87,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
     }
   }
 
-  // Add more using in-app camera
   Future<void> _addMoreImageFromCamera() async {
     try {
       final cams = await availableCameras();
@@ -235,7 +233,6 @@ class _PdfPreviewScreenState extends State<PdfPreviewScreen> {
       List<int> pdfBytes = await document.save();
       document.dispose();
 
-      // If still too large, attempt aggressive recompress & rebuild
       if (pdfBytes.length > _pdfMaxBytes) {
         final aggressivePerImage = max(6 * 1024, (_pdfMaxBytes ~/ imageCount));
         final List<String> aggressivePaths = [];

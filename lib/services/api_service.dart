@@ -3,10 +3,8 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class ApiService {
-  // change to your backend base url
   static const String baseUrl = 'https://api.intisca.com';
 
-  // Helper to decode JSON and tolerate either { "files": [...] } or a raw list
   static dynamic _decodeBody(http.Response resp) {
     final jsonBody = jsonDecode(resp.body);
     if (jsonBody is Map && jsonBody.containsKey('files')) {
@@ -15,7 +13,6 @@ class ApiService {
     return jsonBody;
   }
 
-  // Upload file -> /process-document (multipart)
   static Future<Map<String, dynamic>> processDocument(
     String localPath,
     String userEmail,
@@ -42,7 +39,6 @@ class ApiService {
     }
   }
 
-  // list-files: return a List<dynamic> of file maps
   static Future<List<dynamic>> listFiles(String userEmail) async {
     final uri = Uri.parse('$baseUrl/list-files/$userEmail');
     final resp = await http.get(uri);
@@ -69,7 +65,6 @@ class ApiService {
     }
   }
 
-  // create-chat (legacy compatibility wrapper)
   static Future<Map<String, dynamic>> createChat(
     Map<String, dynamic> payload,
   ) async {
@@ -88,7 +83,6 @@ class ApiService {
     }
   }
 
-  // create-chat-from-s3 explicit - accept 200 or 202 and return parsed body
   static Future<Map<String, dynamic>> createChatFromS3({
     required String userEmail,
     String? s3Key,
@@ -112,7 +106,6 @@ class ApiService {
       headers: {'Content-Type': 'application/json'},
     );
 
-    // Accept 200 or 202 and parse body if present
     if (resp.statusCode == 200 || resp.statusCode == 202) {
       if (resp.body.isNotEmpty) {
         try {
@@ -131,7 +124,6 @@ class ApiService {
     }
   }
 
-  // ask backend for a reply
   static Future<Map<String, dynamic>> getChatReply({
     required String query,
     required String? userEmail,
